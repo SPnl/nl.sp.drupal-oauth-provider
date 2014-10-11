@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * Let op: oauth2_server heeft geen API om automatisch servers of clients toe te voegen.
+ * Dat betekent dat via Structuur -> OAuth2 Servers een server moet worden aangemaakt met de volgende instellingen:
+ * - Naam: Main. 'Require exact redirect uri' uitvinken.
+ * - Scope toevoegen met systeemnaam 'sp'.
+ * - Clients toevoegen voor iedere site. Vul de exacte redirect-uri in (voor Drupal-sites: https://<sitenaam>/oauth/authorized2/1) en vink het hokje 'Automatically authorize this client' aan.
+ * De onderstaande hooks zorgen voor het beschikbaar maken van een API om informatie over de ingelogde gebruiker en zijn groepen op te vragen.
+ */
+
+/**
+ * Implementation of hook_default_services_endpoint().
+ * Maakt een OAuth2-geauthenticeerde API beschikbaar onder /oauth2/api
+ * @return array Endpoints
+ */
+function oauthloginprovider_default_services_endpoint() {
+	$endpoint = new stdClass();
+	$endpoint->disabled = false;
+	$endpoint->api_version = 3;
+	$endpoint->name = 'oauth2login';
+	$endpoint->server = 'rest_server';
+	$endpoint->path = 'oauth2/api';
+	$endpoint->authentication = array(
+		'oauth2_server' => array(
+			'server' => 'main',
+		),
+	);
+	$endpoint->server_settings = array(
+		'formatters' => array(
+			'bencode' => true,
+			'json'    => true,
+			'php'     => true,
+			'xml'     => true,
+			'jsonp'   => false,
+		),
+		'parsers'    => array(
+			'application/json'                  => true,
+			'application/vnd.php.serialized'    => true,
+			'application/x-www-form-urlencoded' => true,
+			'application/xml'                   => true,
+			'multipart/form-data'               => true,
+			'text/xml'                          => true,
+		),
+	);
+	$endpoint->resources = array(
+		'me' => array(
+			'operations' => array(
+				'index' => array(
+					'enabled'  => '1',
+					'settings' => array(
+						'oauth2_server' => array(
+							'require_authentication' => '1',
+							'scope'                  => '',
+						),
+					),
+				),
+			),
+		),
+	);
+	$endpoint->debug = 1;
+
+	$endpoints[$endpoint->name] = $endpoint;
+	return $endpoints;
+}
+
+
+/**
+ * Implementation of hook_services_resources().
+ * API-method om informatie over een gebruiker op te halen vanaf een client-site.
+ * @return array Resources
+ */
+function spoauthprovider_services_resources() {
+	$res = array(
+		'me' => array(
+			'operations' => array(
+				'index' => array(
+					'access callback'         => 'user_access',
+					'access arguments'        => array('access content'),
+					'access arguments append' => false,
+					'args'                    => array(),
+					'help'                    => 'Retrieves information about the current user',
+					'callback'                => 'spoauthprovider_me_index_action',
+				),
+			),
+		),
+	);
+	return $res;
+}
+
+/**
+ * API-actie onder /oauth2/api/me. Retourneert een object met de ingelogde user,
+ * en een uitgebreid overzicht (met id's en namen) van (Drupal-)rollen.
+ * @return object
+ */
+function spoauthprovider_me_index_action() {
+	global $user;
+
+	$data = (array)$user;
+	unset($data['pass']);
+	unset($data['session']);
+	unset($data['cache']);
+
+	foreach($data['roles'] as $key => &$value) {
+		$data['roles'][$key] = array(
+			'id' => $key,
+			'name' => $value,
+		);
+	}
+
+	return (object)$data;
+}

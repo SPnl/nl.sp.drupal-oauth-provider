@@ -1,0 +1,10 @@
+name = SP OAuth Provider
+description = Experimental module that configures a Drupal website as an OAuth2 Provider
+core = 7.x
+version = 1.0
+package = sprbs
+
+dependencies[] = services
+dependencies[] = services_oauth
+dependencies[] = rest_server
+dependencies[] = oauth2_server
