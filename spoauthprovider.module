@@ -147,9 +147,11 @@ function spoauthprovider_me_index_action() {
 	global $user;
 
 	$data = (array)$user;
-	unset($data['pass']);
-	unset($data['session']);
-	unset($data['cache']);
+	$unset = array('pass', 'session', 'cache', 'sid', 'ssid', 'uid', 'data');
+	foreach($unset as $u) {
+		if(array_key_exists($u, $data))
+			unset($data[$u]);
+	}
 
 	foreach($data['roles'] as $key => &$value) {
 		$data['roles'][$key] = array(
