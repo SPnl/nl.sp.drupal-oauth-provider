@@ -91,7 +91,6 @@ function spoauthprovider_services_resources() {
 					'access callback'         => 'user_access',
 					'access arguments'        => array('access content'),
 					'access arguments append' => false,
-					'args'                    => array(),
 					'help'                    => 'Retrieves information about the current user',
 					'callback'                => 'spoauthprovider_me_index_action',
 				),
@@ -100,10 +99,7 @@ function spoauthprovider_services_resources() {
 		'roles' => array(
 			'operations' => array(
 				'index' => array(
-					'access callback'         => 'user_access',
-					'access arguments'        => array('access content'),
-					'access arguments append' => false,
-					'args'                    => array(),
+					'access callback'         => true,
 					'help'                    => 'Lists roles that are available on this Drupal installation',
 					'callback'                => 'spoauthprovider_roles_index_action',
 				),
