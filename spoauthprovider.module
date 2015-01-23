@@ -119,10 +119,13 @@ function spoauthprovider_services_resources() {
  * @return object
  */
 function spoauthprovider_me_index_action() {
-	global $user;
 
-	$data = (array)$user;
-	$unset = array('pass', 'session', 'cache', 'sid', 'ssid', 'uuid', 'data');
+	// Load entire user object (anders zijn extra velden niet beschikbaar)
+	global $user;
+	$myuser = user_load($user->uid);
+
+	$data = (array)$myuser;
+	$unset = array('pass', 'session', 'cache', 'sid', 'ssid', 'uuid', 'data', 'rdf_mapping');
 	foreach($unset as $u) {
 		if(array_key_exists($u, $data))
 			unset($data[$u]);
@@ -133,6 +136,11 @@ function spoauthprovider_me_index_action() {
 			'id' => $key,
 			'name' => $value,
 		);
+	}
+
+	foreach($data as $key => &$value) {
+		if(is_array($value) && array_key_exists(LANGUAGE_NONE, $value))
+			$value = $value[LANGUAGE_NONE][0]['value'];
 	}
 
 	return (object)$data;
