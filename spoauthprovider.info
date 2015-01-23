@@ -9,4 +9,3 @@ dependencies[] = services_oauth
 dependencies[] = rest_server
 dependencies[] = oauth2_server
 dependencies[] = civicrm
-dependencies[] = profile2_spnet

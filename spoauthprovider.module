@@ -135,15 +135,6 @@ function spoauthprovider_me_index_action() {
 		);
 	}
 
-	$data['profile'] = array();
-	$profile = (array)profile2_load_by_user($user, 'main');
-	if($profile) {
-		$get_fields = array('first_name','middle_name','last_name','initials','phone_primary','email_primary','afdeling');
-		foreach ($get_fields as $f) {
-			$data['profile'][ $f ] = $profile[ 'field_' . $f ][ LANGUAGE_NONE ][0]['value'];
-		}
-	}
-
 	return (object)$data;
 }
 
