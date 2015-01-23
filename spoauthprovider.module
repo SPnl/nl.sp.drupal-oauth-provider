@@ -57,19 +57,6 @@ function oauthloginprovider_default_services_endpoint() {
 				),
 			),
 		),
-		'me_full' => array(
-			'operations' => array(
-				'index' => array(
-					'enabled'  => '1',
-					'settings' => array(
-						'oauth2_server' => array(
-							'require_authentication' => '1',
-							'scope'                  => 'sp',
-						),
-					),
-				),
-			),
-		),
 		'roles' => array(
 			'operations' => array(
 				'index' => array(
@@ -107,18 +94,6 @@ function spoauthprovider_services_resources() {
 					'args'                    => array(),
 					'help'                    => 'Retrieves information about the current user',
 					'callback'                => 'spoauthprovider_me_index_action',
-				),
-			),
-		),
-		'me_full' => array(
-			'operations' => array(
-				'index' => array(
-					'access callback'         => 'user_access',
-					'access arguments'        => array('access content'),
-					'access arguments append' => false,
-					'args'                    => array(),
-					'help'                    => 'Retrieves information about the current user, including address data from CiviCRM',
-					'callback'                => 'spoauthprovider_me_full_action',
 				),
 			),
 		),
@@ -160,39 +135,14 @@ function spoauthprovider_me_index_action() {
 		);
 	}
 
-	return (object)$data;
-}
-
-/**
- * API-actie onder /oauth2/api/me/full. Retourneert de ingelogde user verrijkt
- * met gegevens uit CiviCRM (adres, afdeling e.d.).
- */
-function spoauthprovider_me_full_action() {
-
-	if(!civicrm_initialize())
-		return false;
-
-	$data = spoauthprovider_me_index_action();
-	$data->civicrm = array();
-
-	$uf = civicrm_api3('UFMatch', 'getsingle', array(
-		'uf_id' => $data->uid,
-	));
-	if(!$uf)
-		return $data;
-
-	$contact = civicrm_api3('Contact', 'getsingle', array(
-		'id' => $uf['contact_id'],
-	));
-	if(!$contact)
-		return data;
-
-	$return_keys = array('contact_id', 'first_name', 'middle_name', 'last_name', 'street_address', 'city', 'postal_code', 'phone', 'email');
-	foreach($return_keys as $key) {
-		$data->civicrm[$key] = $contact[$key];
+	$data['profile'] = array();
+	$profile = (array)profile2_load_by_user($user, 'main');
+	if($profile) {
+		$get_fields = array('first_name','middle_name','last_name','initials','phone_primary','email_primary','afdeling');
+		foreach ($get_fields as $f) {
+			$data['profile'][ $f ] = $profile[ 'field_' . $f ][ LANGUAGE_NONE ][0]['value'];
+		}
 	}
-
-	// TODO add geodata
 
 	return (object)$data;
 }
