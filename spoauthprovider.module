@@ -89,8 +89,7 @@ function spoauthprovider_services_resources() {
 			'operations' => array(
 				'index' => array(
 					'access callback'         => 'user_access',
-					'access arguments'        => array('access content'),
-					'access arguments append' => false,
+					'access arguments'        => array('use oauth2 server'),
 					'help'                    => 'Retrieves information about the current user',
 					'callback'                => 'spoauthprovider_me_index_action',
 				),
@@ -99,7 +98,8 @@ function spoauthprovider_services_resources() {
 		'roles' => array(
 			'operations' => array(
 				'index' => array(
-					'access callback'         => true,
+					'access callback'         => 'user_access',
+					'access arguments'	  => array('use oauth2 server'),
 					'help'                    => 'Lists roles that are available on this Drupal installation',
 					'callback'                => 'spoauthprovider_roles_index_action',
 				),
@@ -150,7 +150,7 @@ function spoauthprovider_roles_index_action() {
 
 	$data = array();
 
-	foreach(user_roles() as $key => $name) {
+	foreach(user_roles(true) as $key => $name) {
 		$data['roles'][$key] = array(
 			'id' => $key,
 			'name' => $name,
