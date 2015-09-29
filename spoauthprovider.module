@@ -121,6 +121,14 @@ function spoauthprovider_me_index_action() {
 	$myuser = user_load($user->uid);
 
 	$data = (array)$myuser;
+	watchdog(
+		'spoathprovider',
+		'Me action user object: %user',
+		array(
+			'%user' => print_r($data, true),
+		),
+		WATCHDOG_DEBUG
+	);
 	$unset = array('pass', 'session', 'cache', 'sid', 'ssid', 'uuid', 'data', 'rdf_mapping');
 	foreach($unset as $u) {
 		if(array_key_exists($u, $data))
