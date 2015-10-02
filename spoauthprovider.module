@@ -118,17 +118,9 @@ function spoauthprovider_me_index_action() {
 
 	// Load entire user object (anders zijn extra velden niet beschikbaar)
 	global $user;
-	$myuser = user_load($user->uid);
+	$myuser = user_load($user->uid, true);
 
 	$data = (array)$myuser;
-	watchdog(
-		'spoathprovider',
-		'Me action user object: %user',
-		array(
-			'%user' => print_r($data, true),
-		),
-		WATCHDOG_DEBUG
-	);
 	$unset = array('pass', 'session', 'cache', 'sid', 'ssid', 'uuid', 'data', 'rdf_mapping');
 	foreach($unset as $u) {
 		if(array_key_exists($u, $data))
