@@ -28,19 +28,20 @@ function oauthloginprovider_default_services_endpoint() {
 	);
 	$endpoint->server_settings = array(
 		'formatters' => array(
-			'bencode' => true,
+			'bencode' => false,
 			'json'    => true,
-			'php'     => true,
+			'php'     => false,
 			'xml'     => true,
 			'jsonp'   => false,
 		),
 		'parsers'    => array(
 			'application/json'                  => true,
 			'application/vnd.php.serialized'    => true,
-			'application/x-www-form-urlencoded' => true,
+			'application/x-www-form-urlencoded' => false,
 			'application/xml'                   => true,
 			'multipart/form-data'               => true,
 			'text/xml'                          => true,
+			'text/yaml'                         => false,
 		),
 	);
 	$endpoint->resources = array(
@@ -65,6 +66,19 @@ function oauthloginprovider_default_services_endpoint() {
 						'oauth2_server' => array(
 							'require_authentication' => '0',
 							'scope'                  => 'sp',
+						),
+					),
+				),
+			),
+		),
+		'civiapi' => array(
+			'operations' => array(
+				'index' => array(
+					'enabled'  => '1',
+					'settings' => array(
+						'oauth2_server' => array(
+							'require_authentication' => '1',
+							'scope'                  => 'civicrm',
 						),
 					),
 				),
@@ -99,9 +113,18 @@ function spoauthprovider_services_resources() {
 			'operations' => array(
 				'index' => array(
 					'access callback'         => 'user_access',
-					'access arguments'	  => array('use oauth2 server'),
+					'access arguments'	  	  => array('use oauth2 server'),
 					'help'                    => 'Lists roles that are available on this Drupal installation',
 					'callback'                => 'spoauthprovider_roles_index_action',
+				),
+			),
+		),
+		'civiapi' => array(
+			'operations' => array(
+				'index' => array(
+					'access callback'         => 'spoauthprovider_civiapi_access',
+					'help'                    => 'Calls the CiviCRM API as the current user',
+					'callback'                => 'spoauthprovider_civiapi_index_action',
 				),
 			),
 		),
@@ -158,4 +181,47 @@ function spoauthprovider_roles_index_action() {
 	}
 
 	return (object)$data;
+}
+
+/**
+ * API-actie onder /oauth2/api/civiapi. Roept de CiviCRM-API aan met de rechten van de huidige gebruiker.
+ * Required parameters:
+ * - key, de CiviCRM site key (gewoon als extra check)
+ * - alle toepasselijke CiviCRM API parameters: entity, action, debug, sequential, id, enz enz enz
+ * @return object
+ */
+function spoauthprovider_civiapi_index_action() {
+
+	if(!civicrm_initialize()) {
+		return (object)['is_error' => 1, 'error_message' => 'Could not initialize CiviCRM.'];
+	}
+
+	if (empty($_REQUEST['key']) || !CRM_Utils_System::authenticateKey(FALSE)) {
+			return (object)['is_error' => 1, 'error_message' => 'Invalid CiviCRM site key.'];
+	}
+
+	$entity = $_REQUEST['entity'];
+	$action = $_REQUEST['action'];
+	if(!$entity || !$action) {
+		return (object)['is_error' => 1, 'error_message' => 'Required parameters "entity" and "action" missing.'];
+	}
+	if(stripos($action, 'get') !== 0) {
+		return (object)['is_error' => 1, 'error_message' => 'Only GET calls are currently allowed via this API.'];
+	}
+
+	// We gebruiken van de CiviCRM REST-klasse alleen de process-functie.
+	// Niet handle() of run() want die gaan authenticeren obv de API key.
+
+	$args = ['civicrm', $entity, $action];
+	$result = CRM_Utils_REST::process($args, CRM_Utils_REST::buildParamList());
+
+	return (object)$result;
+}
+
+/**
+ * Access callback voor /civiapi resource.
+ * @return bool Has access
+ */
+function spoauthprovider_civiapi_access() {
+	return (user_access('use oauth2 server') && user_access('access CiviCRM'));
 }
