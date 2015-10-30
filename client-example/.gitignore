@@ -1,0 +1,5 @@
+# .gitignore for oauth2 example
+
+config.php
+composer.lock
+vendor/

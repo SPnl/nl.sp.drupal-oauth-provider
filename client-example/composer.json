@@ -1,0 +1,8 @@
+{
+  "name": "levity/oauth-consumer-demo",
+  "description": "OAuth Consumer Demo",
+  "require": {
+    "php": ">=5.5",
+    "adoy/oauth2": "~1.3"
+  }
+}
