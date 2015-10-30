@@ -62,21 +62,24 @@ if (!isset($_GET['action']) || $_GET['action'] != 'callback') {
     // CiviCRM API call test
 
     echo '<br />Met onze access token kunnen we nu ook wat CiviCRM API calls doen.<br />
-            Dit zijn de eerste 10 contacten waartoe we toegang hebben:<br />';
+            Dit zijn de eerste 20 contacten waartoe we toegang hebben:<br />';
+
+    // Contact call test
 
     $contacts = $client->fetch(ENDPOINT . 'api/civiapi.json', [
       'key'            => CIVICRM_SITEKEY,
       'entity'         => 'Contact',
       'action'         => 'get',
-      'options[limit]' => 10,
+      'options[limit]' => 20,
     ]);
+    // var_dump($contacts);
 
-    if ($contacts['code'] != 200 || $contacts['result']['is_error']) {
-      echo 'API-error: HTTP ' . $contacts['code'] . ' - Civi msg: ' . $contacts['result']['error_message'] . '<br /><br />';
-    } else {
+    if ($contacts['code'] == 200 && !$contacts['result']['is_error']) {
       foreach ($contacts['result']['values'] as $lid) {
-        echo '- ' . $lid['contact_id'] . ' ' . $lid['display_name'] . ' (' . $lid['street_address'] . ', ' . $lid['postal_code'] . ' ' . $lid['city'] . ')<br />';
+        echo '- ' . $lid['contact_id'] . ' ' . $lid['display_name'] . ' (' . $lid['street_address'] . ', ' . $lid['postal_code'] . ' ' . $lid['city'] . '; ' . $lid['phone'] . '; ' . $lid['email'] . '; ' . $lid['geo_code_1'] . ',' . $lid['geo_code_2'] . ')<br />'; //  - address-id: ' . $lid['address_id'] . '
       }
+    } else {
+      echo 'API-error: HTTP ' . $contacts['code'] . ' - Civi msg: ' . $contacts['result']['error_message'] . '<br /><br />';
     }
 
     echo '<br /><br /><a href="' . $_SERVER['PHP_SELF'] . '">Nog een keer</a>';

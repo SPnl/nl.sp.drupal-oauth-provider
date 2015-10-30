@@ -16,78 +16,79 @@
  */
 function oauthloginprovider_default_services_endpoint() {
 	$endpoint = new stdClass();
-	$endpoint->disabled = false;
+	$endpoint->disabled = FALSE;
 	$endpoint->api_version = 3;
 	$endpoint->name = 'oauth2login';
 	$endpoint->server = 'rest_server';
 	$endpoint->path = 'oauth2/api';
-	$endpoint->authentication = array(
-		'oauth2_server' => array(
+	$endpoint->authentication = [
+		'oauth2_server' => [
 			'server' => 'main',
-		),
-	);
-	$endpoint->server_settings = array(
-		'formatters' => array(
-			'bencode' => false,
-			'json'    => true,
-			'php'     => false,
-			'xml'     => true,
-			'jsonp'   => false,
-		),
-		'parsers'    => array(
-			'application/json'                  => true,
-			'application/vnd.php.serialized'    => true,
-			'application/x-www-form-urlencoded' => false,
-			'application/xml'                   => true,
-			'multipart/form-data'               => true,
-			'text/xml'                          => true,
-			'text/yaml'                         => false,
-		),
-	);
-	$endpoint->resources = array(
-		'me' => array(
-			'operations' => array(
-				'index' => array(
+		],
+	];
+	$endpoint->server_settings = [
+		'formatters' => [
+			'bencode' => FALSE,
+			'json'    => TRUE,
+			'php'     => FALSE,
+			'xml'     => TRUE,
+			'jsonp'   => FALSE,
+		],
+		'parsers'    => [
+			'application/json'                  => TRUE,
+			'application/vnd.php.serialized'    => TRUE,
+			'application/x-www-form-urlencoded' => FALSE,
+			'application/xml'                   => TRUE,
+			'multipart/form-data'               => TRUE,
+			'text/xml'                          => TRUE,
+			'text/yaml'                         => FALSE,
+		],
+	];
+	$endpoint->resources = [
+		'me'      => [
+			'operations' => [
+				'index' => [
 					'enabled'  => '1',
-					'settings' => array(
-						'oauth2_server' => array(
+					'settings' => [
+						'oauth2_server' => [
 							'require_authentication' => '1',
 							'scope'                  => 'sp',
-						),
-					),
-				),
-			),
-		),
-		'roles' => array(
-			'operations' => array(
-				'index' => array(
+						],
+					],
+				],
+			],
+		],
+		'roles'   => [
+			'operations' => [
+				'index' => [
 					'enabled'  => '1',
-					'settings' => array(
-						'oauth2_server' => array(
+					'settings' => [
+						'oauth2_server' => [
 							'require_authentication' => '0',
 							'scope'                  => 'sp',
-						),
-					),
-				),
-			),
-		),
-		'civiapi' => array(
-			'operations' => array(
-				'index' => array(
+						],
+					],
+				],
+			],
+		],
+		'civiapi' => [
+			'operations' => [
+				'index' => [
 					'enabled'  => '1',
-					'settings' => array(
-						'oauth2_server' => array(
+					'settings' => [
+						'oauth2_server' => [
 							'require_authentication' => '1',
 							'scope'                  => 'civicrm',
-						),
-					),
-				),
-			),
-		),
-	);
+						],
+					],
+				],
+			],
+		],
+	];
 	$endpoint->debug = 1;
 
-	$endpoints[$endpoint->name] = $endpoint;
+	$endpoints[ $endpoint->name ] = $endpoint;
+
 	return $endpoints;
 }
 
@@ -98,37 +99,38 @@ function oauthloginprovider_default_services_endpoint() {
  * @return array Resources
  */
 function spoauthprovider_services_resources() {
-	$res = array(
-		'me' => array(
-			'operations' => array(
-				'index' => array(
-					'access callback'         => 'user_access',
-					'access arguments'        => array('use oauth2 server'),
-					'help'                    => 'Retrieves information about the current user',
-					'callback'                => 'spoauthprovider_me_index_action',
-				),
-			),
-		),
-		'roles' => array(
-			'operations' => array(
-				'index' => array(
-					'access callback'         => 'user_access',
-					'access arguments'	  	  => array('use oauth2 server'),
-					'help'                    => 'Lists roles that are available on this Drupal installation',
-					'callback'                => 'spoauthprovider_roles_index_action',
-				),
-			),
-		),
-		'civiapi' => array(
-			'operations' => array(
-				'index' => array(
-					'access callback'         => 'spoauthprovider_civiapi_access',
-					'help'                    => 'Calls the CiviCRM API as the current user',
-					'callback'                => 'spoauthprovider_civiapi_index_action',
-				),
-			),
-		),
-	);
+	$res = [
+		'me'      => [
+			'operations' => [
+				'index' => [
+					'access callback'  => 'user_access',
+					'access arguments' => ['use oauth2 server'],
+					'help'             => 'Retrieves information about the current user',
+					'callback'         => 'spoauthprovider_me_index_action',
+				],
+			],
+		],
+		'roles'   => [
+			'operations' => [
+				'index' => [
+					'access callback'  => 'user_access',
+					'access arguments' => ['use oauth2 server'],
+					'help'             => 'Lists roles that are available on this Drupal installation',
+					'callback'         => 'spoauthprovider_roles_index_action',
+				],
+			],
+		],
+		'civiapi' => [
+			'operations' => [
+				'index' => [
+					'access callback' => 'spoauthprovider_civiapi_access',
+					'help'            => 'Calls the CiviCRM API as the current user',
+					'callback'        => 'spoauthprovider_civiapi_index_action',
+				],
+			],
+		],
+	];
+
 	return $res;
 }
 
@@ -141,28 +143,30 @@ function spoauthprovider_me_index_action() {
 
 	// Load entire user object (anders zijn extra velden niet beschikbaar)
 	global $user;
-	$myuser = user_load($user->uid, true);
+	$myuser = user_load($user->uid, TRUE);
 
-	$data = (array)$myuser;
-	$unset = array('pass', 'session', 'cache', 'sid', 'ssid', 'uuid', 'data', 'rdf_mapping');
-	foreach($unset as $u) {
-		if(array_key_exists($u, $data))
-			unset($data[$u]);
+	$data = (array) $myuser;
+	$unset = ['pass', 'session', 'cache', 'sid', 'ssid', 'uuid', 'data', 'rdf_mapping'];
+	foreach ($unset as $u) {
+		if (array_key_exists($u, $data)) {
+			unset($data[ $u ]);
+		}
 	}
 
-	foreach($data['roles'] as $key => &$value) {
-		$data['roles'][$key] = array(
-			'id' => $key,
+	foreach ($data['roles'] as $key => &$value) {
+		$data['roles'][ $key ] = [
+			'id'   => $key,
 			'name' => $value,
-		);
+		];
 	}
 
-	foreach($data as $key => &$value) {
-		if(is_array($value) && array_key_exists(LANGUAGE_NONE, $value))
-			$value = $value[LANGUAGE_NONE][0]['value'];
+	foreach ($data as $key => &$value) {
+		if (is_array($value) && array_key_exists(LANGUAGE_NONE, $value)) {
+			$value = $value[ LANGUAGE_NONE ][0]['value'];
+		}
 	}
 
-	return (object)$data;
+	return (object) $data;
 }
 
 /**
@@ -171,16 +175,16 @@ function spoauthprovider_me_index_action() {
  */
 function spoauthprovider_roles_index_action() {
 
-	$data = array();
+	$data = [];
 
-	foreach(user_roles(true) as $key => $name) {
-		$data['roles'][$key] = array(
-			'id' => $key,
+	foreach (user_roles(TRUE) as $key => $name) {
+		$data['roles'][ $key ] = [
+			'id'   => $key,
 			'name' => $name,
-		);
+		];
 	}
 
-	return (object)$data;
+	return (object) $data;
 }
 
 /**
@@ -192,30 +196,35 @@ function spoauthprovider_roles_index_action() {
  */
 function spoauthprovider_civiapi_index_action() {
 
-	if(!civicrm_initialize()) {
-		return (object)['is_error' => 1, 'error_message' => 'Could not initialize CiviCRM.'];
+	if (!civicrm_initialize()) {
+		return (object) ['is_error' => 1, 'error_message' => 'Could not initialize CiviCRM.'];
 	}
 
 	if (empty($_REQUEST['key']) || !CRM_Utils_System::authenticateKey(FALSE)) {
-			return (object)['is_error' => 1, 'error_message' => 'Invalid CiviCRM site key.'];
+		return (object) ['is_error' => 1, 'error_message' => 'Invalid CiviCRM site key.'];
 	}
 
+	// Tijdelijke(?) hack -> via een call als dit initialiseert CiviCRM blijkbaar niet automatisch de userdata, waardoor we geen ACL hadden
+	global $user;
+	$params = [];
+	civicrm_user_login($params, $user);
+
+	// Filter API call parameters
 	$entity = $_REQUEST['entity'];
 	$action = $_REQUEST['action'];
-	if(!$entity || !$action) {
-		return (object)['is_error' => 1, 'error_message' => 'Required parameters "entity" and "action" missing.'];
+	if (!$entity || !$action) {
+		return (object) ['is_error' => 1, 'error_message' => 'Required parameters "entity" and "action" missing.'];
 	}
-	if(stripos($action, 'get') !== 0) {
-		return (object)['is_error' => 1, 'error_message' => 'Only GET calls are currently allowed via this API.'];
+	if (stripos($action, 'get') !== 0) {
+		return (object) ['is_error' => 1, 'error_message' => 'Only GET calls are currently allowed via this API.'];
 	}
 
 	// We gebruiken van de CiviCRM REST-klasse alleen de process-functie.
 	// Niet handle() of run() want die gaan authenticeren obv de API key.
-
 	$args = ['civicrm', $entity, $action];
 	$result = CRM_Utils_REST::process($args, CRM_Utils_REST::buildParamList());
 
-	return (object)$result;
+	return (object) $result;
 }
 
 /**
