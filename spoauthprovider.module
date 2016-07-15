@@ -4,7 +4,7 @@
  * Let op: oauth2_server heeft geen API om automatisch servers of clients toe te voegen.
  * Dat betekent dat via Structuur -> OAuth2 Servers een server moet worden aangemaakt met de volgende instellingen:
  * - Naam: Main. 'Require exact redirect uri' uitvinken.
- * - Scope toevoegen met systeemnaam 'sp'.
+ * - Scope toevoegen met systeemnaam 'sp' en een scope met systeemnaam 'civicrm'.
  * - Clients toevoegen voor iedere site. Vul de exacte redirect-uri in (voor Drupal-sites: https://<sitenaam>/oauth/authorized2/1) en vink het hokje 'Automatically authorize this client' aan.
  * De onderstaande hooks zorgen voor het beschikbaar maken van een API om informatie over de ingelogde gebruiker en zijn groepen op te vragen.
  */
