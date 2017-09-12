@@ -1,0 +1,13 @@
+{
+  "name": "SPnl/nl.sp.drupal-oauth-provider",
+  "description": "Module that configures a Drupal website as an OAuth2 Provider",
+  "version": "1.1.0",
+  "type": "drupal-module",
+  "authors": [
+    {
+      "name": "Kevin Levie",
+      "email": "kevin@levity.nl"
+    }
+  ],
+  "license": "GPL-2.0"
+}
