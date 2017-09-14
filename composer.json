@@ -1,7 +1,7 @@
 {
-  "name": "SPnl/nl.sp.drupal-oauth-provider",
+  "name": "spnl/nl.sp.drupal-oauth-provider",
   "description": "Module that configures a Drupal website as an OAuth2 Provider",
-  "type": "drupal-module",
+  "type": "drupal-custom-module",
   "authors": [
     {
       "name": "Kevin Levie",
