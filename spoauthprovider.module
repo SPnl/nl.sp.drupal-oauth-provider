@@ -35,7 +35,7 @@ function oauthloginprovider_default_services_endpoint() {
 			'jsonp'   => FALSE,
 		],
 		'parsers'    => [
-			'application/json'                  => TRUE,
+			'application/json'                  => TRUE, //Nice, but this will never work since we did not provide args to the endpoint resources
 			'application/vnd.php.serialized'    => TRUE,
 			'application/x-www-form-urlencoded' => FALSE,
 			'application/xml'                   => TRUE,
@@ -82,6 +82,15 @@ function oauthloginprovider_default_services_endpoint() {
 						],
 					],
 				],
+ 				'create' => [
+ 					'enabled'  => '1',
+ 					'settings' => [
+ 						'oauth2_server' => [
+ 							'require_authentication' => '1',
+ 							'scope'                  => 'civicrm',
+ 						],
+ 					],
+ 				],
 			],
 		],
 	];
@@ -127,6 +136,11 @@ function spoauthprovider_services_resources() {
 					'help'            => 'Calls the CiviCRM API as the current user',
 					'callback'        => 'spoauthprovider_civiapi_index_action',
 				],
+ 				'create' => [
+ 					'access callback' => 'spoauthprovider_civiapi_access',
+ 					'help'            => 'Calls the CiviCRM API as the current user',
+ 					'callback'        => 'spoauthprovider_civiapi_index_action',
+ 				],
 			],
 		],
 	];
@@ -215,9 +229,10 @@ function spoauthprovider_civiapi_index_action() {
 	if (!$entity || !$action) {
 		return (object) ['is_error' => 1, 'error_message' => 'Required parameters "entity" and "action" missing.'];
 	}
-	if (stripos($action, 'get') !== 0) {
-		return (object) ['is_error' => 1, 'error_message' => 'Only GET calls are currently allowed via this API.'];
-	}
+	// Commented this out since we do want to make altering calls (e.g. creating a group, mailing, etc.)
+	// if (stripos($action, 'get') !== 0) {
+	// 	return (object) ['is_error' => 1, 'error_message' => 'Only GET calls are currently allowed via this API.'];
+	// }
 
 	// We gebruiken van de CiviCRM REST-klasse alleen de process-functie.
 	// Niet handle() of run() want die gaan authenticeren obv de API key.
