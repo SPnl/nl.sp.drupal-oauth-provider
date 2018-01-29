@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Update 7100 since we added the civiapi create/POST endpoint, enable it here.
+ */
+function spoauthprovider_update_7100() {
+  $loaded = module_load_include('module', 'spoauthprovider');
+  if (!$loaded) {
+    throw new DrupalUpdateException('Could not load spoauthprovider');
+  }
+
+  // Fetch the defaults service endpoint
+  $defaults = current(spoauthprovider_default_services_endpoint());
+
+  $loaded = module_load_include('module', 'services');
+  if (!$loaded) {
+    throw new DrupalUpdateException('Could not load services');
+  }
+
+  // Fetch the current endpoint setting
+  $endpoint = services_endpoint_load($defaults->name);
+
+  $needUpdate = false;
+  if ($endpoint->server_settings['parsers']['application/x-www-form-urlencoded'] != true) {
+    $endpoint->server_settings['parsers']['application/x-www-form-urlencoded'] = true;
+    $needUpdate = true;
+  }
+  if (!array_key_exists('create', $endpoint->resources['civiapi']['operations'])) {
+    $endpoint->resources['civiapi']['operations']['create'] = $defaults->resources['civiapi']['operations']['create'];
+    $needUpdate = true;
+  }
+  if ($needUpdate) {
+    // This great services function does not check the return value of ctools_export_crud_save
+    services_endpoint_save($endpoint);
+    return t('Enabled civiapi create (POST) endpoint and application/x-www-form-urlencoded.');
+  }
+  return t('Did not needed to update the endpoint.');
+}

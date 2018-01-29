@@ -14,7 +14,7 @@
  * Maakt een OAuth2-geauthenticeerde API beschikbaar onder /oauth2/api
  * @return array Endpoints
  */
-function oauthloginprovider_default_services_endpoint() {
+function spoauthprovider_default_services_endpoint() {
 	$endpoint = new stdClass();
 	$endpoint->disabled = FALSE;
 	$endpoint->api_version = 3;

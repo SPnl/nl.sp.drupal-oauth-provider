@@ -1,7 +1,7 @@
 name = SP OAuth Provider
 description = Module that configures a Drupal website as an OAuth2 Provider
 core = 7.x
-version = 1.2.0
+version = 1.2.1
 package = sprbs
 
 dependencies[] = services
