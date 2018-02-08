@@ -167,11 +167,21 @@ function spoauthprovider_me_index_action() {
 		}
 	}
 
+	// Note that user_role_permissions argument want role id's as keys, and the output is a value array, in the order of the arguments
+	// the documentation "an array indexed by role ID is returned" is wrong, see the comments
+	// see https://api.drupal.org/api/drupal/modules%21user%21user.module/function/user_role_permissions/7.x
+	$role_permissions = array_combine(array_keys($data['roles']), array_values(user_role_permissions($data['roles'])));
+	$interesting_permissions = ['access CiviCRM', 'access all contacts (view)', 'masquerade as user', 'masquerade as any user', 'masquerade as admin'];
+
 	foreach ($data['roles'] as $key => &$value) {
 		$data['roles'][ $key ] = [
 			'id'   => $key,
 			'name' => $value,
 		];
+		$interesting_permissions_for_this_role = array_values(array_filter(array_keys($role_permissions[$key]), function($v) use ($interesting_permissions) { return in_array($v, $interesting_permissions); }));
+		if (count($interesting_permissions_for_this_role) > 0) {
+			$data['roles'][ $key ]['permissions'] = $interesting_permissions_for_this_role;
+		}
 	}
 
 	foreach ($data as $key => &$value) {
